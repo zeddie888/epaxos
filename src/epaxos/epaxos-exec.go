@@ -2,8 +2,8 @@ package epaxos
 
 import (
 	//    "state"
-	"epaxosproto"
-	"genericsmrproto"
+	"epaxos/lambs/src/epaxosproto"
+	"epaxos/lambs/src/genericsmrproto"
 	"sort"
 	"time"
 )

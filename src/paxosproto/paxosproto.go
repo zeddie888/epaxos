@@ -1,7 +1,7 @@
 package paxosproto
 
 import (
-	"state"
+	"epaxos/lambs/src/state"
 )
 
 const (

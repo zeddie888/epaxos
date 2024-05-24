@@ -1,7 +1,7 @@
 package menciusproto
 
 import (
-	"fastrpc"
+	"epaxos/lambs/src/fastrpc"
 	"io"
 	"sync"
 )

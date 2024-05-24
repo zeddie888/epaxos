@@ -1,7 +1,7 @@
 package genericsmrproto
 
 import (
-	"state"
+	"epaxos/lambs/src/state"
 )
 
 const (

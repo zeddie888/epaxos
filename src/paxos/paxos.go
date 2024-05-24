@@ -1,15 +1,15 @@
 package paxos
 
 import (
-	"dlog"
 	"encoding/binary"
-	"fastrpc"
-	"genericsmr"
-	"genericsmrproto"
+	"epaxos/lambs/src/dlog"
+	"epaxos/lambs/src/fastrpc"
+	"epaxos/lambs/src/genericsmr"
+	"epaxos/lambs/src/genericsmrproto"
+	"epaxos/lambs/src/paxosproto"
+	"epaxos/lambs/src/state"
 	"io"
 	"log"
-	"paxosproto"
-	"state"
 	"time"
 )
 
@@ -99,7 +99,7 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 	return r
 }
 
-//append a log entry to stable storage
+// append a log entry to stable storage
 func (r *Replica) recordInstanceMetadata(inst *Instance) {
 	if !r.Durable {
 		return
@@ -111,7 +111,7 @@ func (r *Replica) recordInstanceMetadata(inst *Instance) {
 	r.StableStore.Write(b[:])
 }
 
-//write a sequence of commands to stable storage
+// write a sequence of commands to stable storage
 func (r *Replica) recordCommands(cmds []state.Command) {
 	if !r.Durable {
 		return
@@ -125,7 +125,7 @@ func (r *Replica) recordCommands(cmds []state.Command) {
 	}
 }
 
-//sync with the stable store
+// sync with the stable store
 func (r *Replica) sync() {
 	if !r.Durable {
 		return

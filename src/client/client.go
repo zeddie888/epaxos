@@ -2,17 +2,17 @@ package main
 
 import (
 	"bufio"
-	"dlog"
+	"epaxos/lambs/src/dlog"
+	"epaxos/lambs/src/genericsmrproto"
+	"epaxos/lambs/src/masterproto"
+	"epaxos/lambs/src/state"
 	"flag"
 	"fmt"
-	"genericsmrproto"
 	"log"
-	"masterproto"
 	"math/rand"
 	"net"
 	"net/rpc"
 	"runtime"
-	"state"
 	"time"
 )
 

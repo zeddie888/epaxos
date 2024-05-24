@@ -3,9 +3,9 @@ package epaxosproto
 import (
 	"bufio"
 	"encoding/binary"
-	"fastrpc"
+	"epaxos/lambs/src/fastrpc"
+	"epaxos/lambs/src/state"
 	"io"
-	"state"
 	"sync"
 )
 

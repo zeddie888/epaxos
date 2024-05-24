@@ -1,11 +1,11 @@
 package main
 
 import (
+	"epaxos/lambs/src/genericsmrproto"
+	"epaxos/lambs/src/masterproto"
 	"flag"
 	"fmt"
-	"genericsmrproto"
 	"log"
-	"masterproto"
 	"net"
 	"net/http"
 	"net/rpc"
