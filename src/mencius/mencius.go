@@ -610,7 +610,7 @@ func (r *Replica) handleCommit(commit *menciusproto.Commit) {
 		}
 		r.instanceSpace[commit.Instance] = &Instance{skip,
 			int(commit.NbInstancesToSkip),
-			nil, //&commit.Command,
+			&commit.Command,
 			0,
 			COMMITTED,
 			nil}

@@ -47,5 +47,5 @@ type Commit struct {
 	Instance          int32
 	Skip              uint8
 	NbInstancesToSkip int32
-	//Command state.Command
+	Command           state.Command
 }
