@@ -610,7 +610,7 @@ func (r *Replica) handleCommit(commit *menciusproto.Commit) {
 		}
 		r.instanceSpace[commit.Instance] = &Instance{skip,
 			int(commit.NbInstancesToSkip),
-			nil, //&commit.Command,
+			&commit.Command,
 			0,
 			COMMITTED,
 			nil}
@@ -695,8 +695,10 @@ func (r *Replica) handleAcceptReply(areply *menciusproto.AcceptReply) {
 	inst := r.instanceSpace[areply.Instance]
 
 	if areply.OK == TRUE {
+		dlog.Println("areply OK")
 		inst.lb.acceptOKs++
 		if areply.SkippedStartInstance > -1 {
+			dlog.Println("Processing skipped start instance")
 			r.instanceSpace[areply.SkippedStartInstance] = &Instance{true,
 				int(areply.SkippedEndInstance-areply.SkippedStartInstance)/r.N + 1,
 				nil,
@@ -708,13 +710,15 @@ func (r *Replica) handleAcceptReply(areply *menciusproto.AcceptReply) {
 
 		if inst.status == COMMITTED || inst.status == EXECUTED { //TODO || aargs.Ballot != inst.ballot {
 			// we've moved on, these are delayed replies, so just ignore
+			dlog.Println("We're moving on")
 			return
 		}
 
 		if inst.lb.acceptOKs+1 > r.N>>1 {
-			if inst.skipped {
+			dlog.Println("Majority accept reached")
+			// if inst.skipped {
 				//TODO what if
-			}
+			// }
 			inst.status = READY
 			if !inst.skipped && areply.Instance > r.latestInstReady {
 				r.latestInstReady = areply.Instance
@@ -722,6 +726,7 @@ func (r *Replica) handleAcceptReply(areply *menciusproto.AcceptReply) {
 			r.updateBlocking(areply.Instance)
 		}
 	} else {
+		dlog.Printf("areply Not OK")
 		// TODO: there is probably another active leader
 		inst.lb.nacks++
 		if areply.Ballot > inst.lb.maxRecvBallot {
@@ -747,6 +752,7 @@ func (r *Replica) updateBlocking(instance int32) {
 	}
 
 	for r.blockingInstance = r.blockingInstance; true; r.blockingInstance++ {
+		dlog.Printf("Blocking instance: %d -> %v", r.blockingInstance, r.instanceSpace[r.blockingInstance])
 		if r.blockingInstance <= r.skippedTo[int(r.blockingInstance)%r.N] {
 			continue
 		}
@@ -767,6 +773,7 @@ func (r *Replica) updateBlocking(instance int32) {
 				dlog.Printf("Am about to commit instance %d\n", r.blockingInstance)
 
 				inst.status = COMMITTED
+				dlog.Printf("inst lb client proposal: %v\n", inst.lb.clientProposal)
 				if inst.lb.clientProposal != nil && !r.Dreply {
 					// give client the all clear
 					dlog.Printf("Sending ACK for req. %d\n", inst.lb.clientProposal.CommandId)
@@ -806,56 +813,75 @@ func (r *Replica) executeCommands() {
 		skippedToOrig[q] = -1
 	}
 
+	seenI := execedUpTo;
+
 	for !r.Shutdown {
 		executed := false
 		jump := false
 		copy(skippedTo, skippedToOrig)
 		for i := execedUpTo + 1; i < r.crtInstance; i++ {
+			// dlog.Printf("processing instance %d, with execedUpTo: %d, and crt: %d\n", i, execedUpTo, r.crtInstance)
+			// dlog.Printf("execute processing instance: %d, with crt: %d\n", i, r.crtInstance)
 			if i < skippedTo[i%int32(r.N)] {
 				continue
 			}
 
 			if r.instanceSpace[i] == nil {
+				// dlog.Printf("instance %d is nil, breaking\n", i)
 				break
 			}
 
 			if r.instanceSpace[i].status == EXECUTED {
+				dlog.Printf("%d -> instance is executed, continuing", i)
 				continue
 			}
+			dlog.Println("check 835")
 
 			if r.instanceSpace[i].status != COMMITTED {
 				if !r.instanceSpace[i].skipped {
 					confInst, present := conflicts[r.instanceSpace[i].command.K]
 					if present && r.instanceSpace[confInst].status != EXECUTED {
+						dlog.Printf("%d -> l 840, breaking", i)
 						break
 					}
 					conflicts[r.instanceSpace[i].command.K] = i
 					jump = true
+					dlog.Printf("%d -> l 845, continuing", i)
 					continue
 				} else {
+					dlog.Printf("%d -> l 848 breaking", i)
 					break
 				}
 			}
+			dlog.Println("check 852")
 
 			if r.instanceSpace[i].skipped {
 				skippedTo[i%int32(r.N)] = i + int32(r.instanceSpace[i].nbInstSkipped*r.N)
 				if !jump {
 					skippedToOrig[i%int32(r.N)] = skippedTo[i%int32(r.N)]
 				}
+				dlog.Printf("%d -> instance skipped, continuing", i)
 				continue
 			}
+			dlog.Println("check 861")
 
 			inst := r.instanceSpace[i]
 			for inst.command == nil {
+				if(i != seenI) {
+					dlog.Printf("instance %d =UWU= sleeping\n", i)
+					seenI = i
+				}
 				time.Sleep(1000 * 1000)
 			}
 			confInst, present := conflicts[inst.command.K]
 			if present && confInst < i && r.instanceSpace[confInst].status != EXECUTED && state.Conflict(r.instanceSpace[confInst].command, inst.command) {
+				dlog.Printf("%d -> l 868 breaking", i)
 				break
 			}
 
 			inst.command.Execute(r.State)
 
+			dlog.Printf("Checking for instance: %d, if we need to send ack\n", i)
 			if r.Dreply && inst.lb != nil && inst.lb.clientProposal != nil {
 				dlog.Printf("Sending ACK for req. %d\n", inst.lb.clientProposal.CommandId)
 				r.ReplyProposeTS(&genericsmrproto.ProposeReplyTS{TRUE, inst.lb.clientProposal.CommandId, state.NIL, inst.lb.clientProposal.Timestamp},
@@ -872,6 +898,7 @@ func (r *Replica) executeCommands() {
 		if !executed {
 			time.Sleep(1000 * 1000)
 		}
+		// dlog.Println("Executing loop")
 	}
 }
 
