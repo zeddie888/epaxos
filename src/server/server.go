@@ -3,6 +3,7 @@ package main
 import (
 	"epaxos/lambs/src/epaxos"
 	"epaxos/lambs/src/gpaxos"
+	"epaxos/lambs/src/laambs"
 	"epaxos/lambs/src/masterproto"
 	"epaxos/lambs/src/mencius"
 	"epaxos/lambs/src/paxos"
@@ -26,6 +27,8 @@ var myAddr *string = flag.String("addr", "", "Server address (this machine). Def
 var doMencius *bool = flag.Bool("m", false, "Use Mencius as the replication protocol. Defaults to false.")
 var doGpaxos *bool = flag.Bool("g", false, "Use Generalized Paxos as the replication protocol. Defaults to false.")
 var doEpaxos *bool = flag.Bool("e", false, "Use EPaxos as the replication protocol. Defaults to false.")
+var doLaambs *bool = flag.Bool("l", false, "Use laambs as the replication protocol. Defaults to false.")
+
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 var thrifty = flag.Bool("thrifty", false, "Use only as many messages as strictly required for inter-replica communication.")
@@ -66,6 +69,10 @@ func main() {
 	} else if *doGpaxos {
 		log.Println("Starting Generalized Paxos replica...")
 		rep := gpaxos.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply)
+		rpc.Register(rep)
+	} else if *doLaambs {
+		log.Println("Starting Laambs replica...")
+		rep := laambs.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *durable)
 		rpc.Register(rep)
 	} else {
 		log.Println("Starting classic Paxos replica...")
