@@ -57,8 +57,9 @@ type Replica struct {
 	highestSchedId  int   // Highest scheduling round we've participated in, init to 0
 	schedW          int   // Size of scheduling window
 	schedSlots      []int // Slots are assigned to us. Guarantee that schedSlots[0] is the next slot for us to use
-	numReqs         int   // Number of requests we've received in this scheduling window
-	numSchedReplies int   // Number of scheduling replies we've received (including this replica), so always >= 1
+	entireSched     [][]int
+	numReqs         int // Number of requests we've received in this scheduling window
+	numSchedReplies int // Number of scheduling replies we've received (including this replica), so always >= 1
 }
 
 type DelayedSkip struct {
@@ -170,9 +171,10 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 		make([]int, len(peerAddrList)),                               // scheduling rate for all replicas in cluster
 		-1,                                                           // highest schedule redet ID
 		schedW,                                                       // scheduling window size
-		make([]int, 0),
-		0, // number of requests received in this scheduling window
-		1, // number of sched replies
+		make([]int, 0),                                               // our schedulex
+		make([][]int, len(peerAddrList)),                             // entire schedule
+		0,                                                            // number of requests received in this scheduling window
+		1,                                                            // number of sched replies
 	}
 
 	r.Durable = durable
