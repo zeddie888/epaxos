@@ -37,6 +37,8 @@ var dreply = flag.Bool("dreply", false, "Reply to client only after command has 
 var beacon = flag.Bool("beacon", false, "Send beacons to other replicas to compare their relative speeds.")
 var durable = flag.Bool("durable", false, "Log to a stable store (i.e., a file in the current dir).")
 
+var schedW *int = flag.Int("w", 100, "Scaling factor for scheduler window. Defaults to 100")
+
 func main() {
 	flag.Parse()
 
@@ -72,7 +74,7 @@ func main() {
 		rpc.Register(rep)
 	} else if *doLaambs {
 		log.Println("Starting Laambs replica...")
-		rep := laambs.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *durable)
+		rep := laambs.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *durable, *schedW)
 		rpc.Register(rep)
 	} else {
 		log.Println("Starting classic Paxos replica...")

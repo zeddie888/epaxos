@@ -10,6 +10,8 @@ import (
 	"epaxos/lambs/src/state"
 	"io"
 	"log"
+	"math"
+	"os"
 	"time"
 )
 
@@ -49,8 +51,13 @@ type Replica struct {
 	skippedTo                []int32
 
 	// Added for laambs
-	schedRates     []int32
-	highestSchedId int32
+	schedRPC       uint8
+	schedChan      chan fastrpc.Serializable
+	schedRates     []int // Request rates for all other replicas, length N
+	highestSchedId int   // Highest scheduling round we've participated in, init to 0
+	schedW         int   // Size of scheduling window
+	schedSlots     []int // Slots are assigned to us. Guarantee that schedSlots[0] is the next slot for us to use
+	numReqs        int   // Number of requests we've received in this scheduling window
 }
 
 type DelayedSkip struct {
@@ -84,7 +91,53 @@ type LeaderBookkeeping struct {
 	nacks          int
 }
 
-func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply bool, durable bool) *Replica {
+func softmax(inputs []int) []float64 {
+	// softmax(x)_i = e^(x_i) / sum e^x_i
+	total := 0.0
+	for i := 0; i < len(inputs); i++ {
+		total += math.Exp(float64(inputs[i]))
+	}
+	var res []float64
+	for i := 0; i < len(inputs); i++ {
+		res = append(res, math.Exp(float64(inputs[i]))/total)
+	}
+	return res
+}
+
+func calculateSlots(slots int, probs []float64) ([]int, int) {
+	var slotAllocs []int
+	totalSlots := 0
+
+	for i := 0; i < len(probs); i++ {
+		numSlots := int(float64(slots) * probs[i])
+		slotAllocs = append(slotAllocs, numSlots)
+		totalSlots += numSlots
+	}
+
+	// fmt.Println(slotAllocs)
+	// fmt.Println("total slots", totalSlots)
+	return slotAllocs, totalSlots
+}
+
+func assignSlots(totalSlots int, numSlotAllocs []int, startIndex int) [][]int {
+	// var overallAllocs []int
+	specificAllocs := make([][]int, len(numSlotAllocs))
+	// For now just write a naive algorithm, N^2 * W
+	i := 0
+	for numAssigned := 0; numAssigned < totalSlots; numAssigned++ {
+		for ; numSlotAllocs[i] <= 0; i = (i + 1) % len(numSlotAllocs) {
+		}
+		// overallAllocs = append(overallAllocs, i)
+		specificAllocs[i] = append(specificAllocs[i], i+startIndex)
+		numSlotAllocs[i]--
+		i = (i + 1) % len(numSlotAllocs)
+	}
+	// fmt.Println("overall", overallAllocs)
+	// fmt.Println("specific", specificAllocs)
+	return specificAllocs
+}
+
+func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply bool, durable bool, schedW int) *Replica {
 	skippedTo := make([]int32, len(peerAddrList))
 	for i := 0; i < len(skippedTo); i++ {
 		skippedTo[i] = -1
@@ -110,8 +163,14 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 		0,
 		0,
 		skippedTo,
-		make([]int32, len(peerAddrList)), // scheduling rate for all replicas in cluster
-		-1,                               // highest schedule redet ID
+		// laambs additions:
+		0, // sched RPC
+		make(chan fastrpc.Serializable, genericsmr.CHAN_BUFFER_SIZE), // sched chan
+		make([]int, len(peerAddrList)),                               // scheduling rate for all replicas in cluster
+		-1,                                                           // highest schedule redet ID
+		schedW,                                                       // scheduling window scaling factor. Window will be of schedW * num_replicas
+		make([]int, 0),
+		0, // number of requests received in this scheduling window
 	}
 
 	r.Durable = durable
@@ -122,6 +181,8 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 	r.commitRPC = r.RegisterRPC(new(laambsproto.Commit), r.commitChan)
 	r.prepareReplyRPC = r.RegisterRPC(new(laambsproto.PrepareReply), r.prepareReplyChan)
 	r.acceptReplyRPC = r.RegisterRPC(new(laambsproto.AcceptReply), r.acceptReplyChan)
+
+	r.schedRPC = r.RegisterRPC(new(laambsproto.Schedule), r.schedChan)
 
 	go r.run()
 
@@ -195,6 +256,35 @@ func (r *Replica) run() {
 
 	for !r.Shutdown {
 
+		// <TODO>: add logic here for scheduling?
+		// If replica is out of available slots, then bcast own request rate and block until schedule is received
+		if len(r.schedSlots) == 0 {
+			r.bcastSched()
+			numSchedReplies := 1
+			// Block until we receive replies from all other replicas
+			for numSchedReplies < r.N {
+				// If we receive outdated schedule, ignore it
+				sched := <-r.schedChan
+				useful := r.handleSched(sched)
+				if useful {
+					numSchedReplies += 1
+				}
+			}
+
+			r.highestSchedId += 1
+			r.numReqs = 0
+
+			// Now we've gotten request rates from everyone
+			// Time to calculate a schedule
+			probs := softmax(r.schedRates)
+			numSlotAllocs, totalSlots := calculateSlots(r.N*r.schedW, probs)
+			// Don't forget to add startIndex to everything
+			startIndex := (r.N * r.schedW) * r.highestSchedId
+			specificSlotAllocs := assignSlots(totalSlots, numSlotAllocs, startIndex)
+
+			r.schedSlots = specificSlotAllocs[r.Id]
+		}
+
 		select {
 
 		case propose := <-r.ProposeChan:
@@ -265,6 +355,14 @@ func (r *Replica) run() {
 	}
 }
 
+func (r *Replica) handleSched(sched *laambsproto.Schedule) bool {
+	if sched.SchedId < r.highestSchedId {
+		return false
+	}
+	r.schedRates[sched.Instance] = sched.NumRequests
+	return true
+}
+
 func (r *Replica) clock() {
 	for !r.Shutdown {
 		time.Sleep(100 * 1000 * 1000)
@@ -307,6 +405,29 @@ func (r *Replica) bcastSkip(startInstance int32, endInstance int32, exceptReplic
 		}
 		sent++
 		r.SendMsgNoFlush(q, r.skipRPC, args)
+	}
+}
+
+func (r *Replica) bcastSched() {
+	defer func() {
+		if err := recover(); err != nil {
+			dlog.Println("Schedule bcast failed:", err)
+		}
+	}()
+
+	args := &laambsproto.Schedule{r.numReqs, r.highestSchedId}
+	q := r.Id
+	for sent := 0; sent < r.N; {
+		q = (q + 1) % int32(r.N)
+		if q == r.Id {
+			break
+		}
+		if !r.Alive[q] {
+			dlog.Println("ERROR: NODE DOWN DURING SCHED BCAST, UNRECOVERABLE ERROR")
+			os.Exit(88)
+		}
+		sent++
+		r.SendMsg(q, r.schedRPC, args)
 	}
 }
 

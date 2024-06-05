@@ -464,7 +464,7 @@ func (t *Schedule) New() fastrpc.Serializable {
 }
 
 func (t *Schedule) BinarySize() (nbytes int, sizeKnown bool) {
-	return 8, true
+	return 12, true
 }
 
 type ScheduleCache struct {
@@ -497,30 +497,36 @@ func (p *ScheduleCache) Put(t *Schedule) {
 	p.mu.Unlock()
 }
 func (t *Schedule) Marshal(wire io.Writer) {
-	var b [8]byte
+	var b [12]byte
 	var bs []byte
-	bs = b[:8]
+	bs = b[:12]
 	tmp32 := t.NumRequests
 	bs[0] = byte(tmp32)
 	bs[1] = byte(tmp32 >> 8)
 	bs[2] = byte(tmp32 >> 16)
 	bs[3] = byte(tmp32 >> 24)
-	tmp32 = t.SchedId
+	tmp32 = t.Instance
 	bs[4] = byte(tmp32)
 	bs[5] = byte(tmp32 >> 8)
 	bs[6] = byte(tmp32 >> 16)
 	bs[7] = byte(tmp32 >> 24)
+	tmp32 = t.SchedId
+	bs[8] = byte(tmp32)
+	bs[9] = byte(tmp32 >> 8)
+	bs[10] = byte(tmp32 >> 16)
+	bs[11] = byte(tmp32 >> 24)
 	wire.Write(bs)
 }
 
 func (t *Schedule) Unmarshal(wire io.Reader) error {
-	var b [8]byte
+	var b [12]byte
 	var bs []byte
-	bs = b[:8]
-	if _, err := io.ReadAtLeast(wire, bs, 8); err != nil {
+	bs = b[:12]
+	if _, err := io.ReadAtLeast(wire, bs, 12); err != nil {
 		return err
 	}
 	t.NumRequests = int32((uint32(bs[0]) | (uint32(bs[1]) << 8) | (uint32(bs[2]) << 16) | (uint32(bs[3]) << 24)))
-	t.SchedId = int32((uint32(bs[4]) | (uint32(bs[5]) << 8) | (uint32(bs[6]) << 16) | (uint32(bs[7]) << 24)))
+	t.Instance = int32((uint32(bs[4]) | (uint32(bs[5]) << 8) | (uint32(bs[6]) << 16) | (uint32(bs[7]) << 24)))
+	t.SchedId = int32((uint32(bs[8]) | (uint32(bs[9]) << 8) | (uint32(bs[10]) << 16) | (uint32(bs[11]) << 24)))
 	return nil
 }
