@@ -52,6 +52,6 @@ type Commit struct {
 
 type Schedule struct {
 	NumRequests int32
-	Instance    int32
+	ReplicaId   int32
 	SchedId     int32
 }

@@ -505,7 +505,7 @@ func (t *Schedule) Marshal(wire io.Writer) {
 	bs[1] = byte(tmp32 >> 8)
 	bs[2] = byte(tmp32 >> 16)
 	bs[3] = byte(tmp32 >> 24)
-	tmp32 = t.Instance
+	tmp32 = t.ReplicaId
 	bs[4] = byte(tmp32)
 	bs[5] = byte(tmp32 >> 8)
 	bs[6] = byte(tmp32 >> 16)
@@ -526,7 +526,7 @@ func (t *Schedule) Unmarshal(wire io.Reader) error {
 		return err
 	}
 	t.NumRequests = int32((uint32(bs[0]) | (uint32(bs[1]) << 8) | (uint32(bs[2]) << 16) | (uint32(bs[3]) << 24)))
-	t.Instance = int32((uint32(bs[4]) | (uint32(bs[5]) << 8) | (uint32(bs[6]) << 16) | (uint32(bs[7]) << 24)))
+	t.ReplicaId = int32((uint32(bs[4]) | (uint32(bs[5]) << 8) | (uint32(bs[6]) << 16) | (uint32(bs[7]) << 24)))
 	t.SchedId = int32((uint32(bs[8]) | (uint32(bs[9]) << 8) | (uint32(bs[10]) << 16) | (uint32(bs[11]) << 24)))
 	return nil
 }

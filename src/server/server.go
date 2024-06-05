@@ -37,7 +37,7 @@ var dreply = flag.Bool("dreply", false, "Reply to client only after command has 
 var beacon = flag.Bool("beacon", false, "Send beacons to other replicas to compare their relative speeds.")
 var durable = flag.Bool("durable", false, "Log to a stable store (i.e., a file in the current dir).")
 
-var schedW *int = flag.Int("w", 100, "Scaling factor for scheduler window. Defaults to 100")
+var schedW *int = flag.Int("w", 100, "Scaling factor for scheduler window. Defaults to 1000")
 
 func main() {
 	flag.Parse()

@@ -51,13 +51,14 @@ type Replica struct {
 	skippedTo                []int32
 
 	// Added for laambs
-	schedRPC       uint8
-	schedChan      chan fastrpc.Serializable
-	schedRates     []int // Request rates for all other replicas, length N
-	highestSchedId int   // Highest scheduling round we've participated in, init to 0
-	schedW         int   // Size of scheduling window
-	schedSlots     []int // Slots are assigned to us. Guarantee that schedSlots[0] is the next slot for us to use
-	numReqs        int   // Number of requests we've received in this scheduling window
+	schedRPC        uint8
+	schedChan       chan fastrpc.Serializable
+	schedRates      []int // Request rates for all other replicas, length N
+	highestSchedId  int   // Highest scheduling round we've participated in, init to 0
+	schedW          int   // Size of scheduling window
+	schedSlots      []int // Slots are assigned to us. Guarantee that schedSlots[0] is the next slot for us to use
+	numReqs         int   // Number of requests we've received in this scheduling window
+	numSchedReplies int   // Number of scheduling replies we've received (including this replica), so always >= 1
 }
 
 type DelayedSkip struct {
@@ -128,7 +129,7 @@ func assignSlots(totalSlots int, numSlotAllocs []int, startIndex int) [][]int {
 		for ; numSlotAllocs[i] <= 0; i = (i + 1) % len(numSlotAllocs) {
 		}
 		// overallAllocs = append(overallAllocs, i)
-		specificAllocs[i] = append(specificAllocs[i], i+startIndex)
+		specificAllocs[i] = append(specificAllocs[i], numAssigned+startIndex)
 		numSlotAllocs[i]--
 		i = (i + 1) % len(numSlotAllocs)
 	}
@@ -168,9 +169,10 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 		make(chan fastrpc.Serializable, genericsmr.CHAN_BUFFER_SIZE), // sched chan
 		make([]int, len(peerAddrList)),                               // scheduling rate for all replicas in cluster
 		-1,                                                           // highest schedule redet ID
-		schedW,                                                       // scheduling window scaling factor. Window will be of schedW * num_replicas
+		schedW,                                                       // scheduling window size
 		make([]int, 0),
 		0, // number of requests received in this scheduling window
+		1, // number of sched replies
 	}
 
 	r.Durable = durable
@@ -259,31 +261,32 @@ func (r *Replica) run() {
 		// <TODO>: add logic here for scheduling?
 		// If replica is out of available slots, then bcast own request rate and block until schedule is received
 		if len(r.schedSlots) == 0 {
+			dlog.Println("out of slots, beginning scheduling wait...")
 			r.bcastSched()
-			numSchedReplies := 1
+			// numSchedReplies := 1
 			// Block until we receive replies from all other replicas
-			for numSchedReplies < r.N {
+			for r.numSchedReplies < r.N {
 				// If we receive outdated schedule, ignore it
 				schedS := <-r.schedChan
 				sched := schedS.(*laambsproto.Schedule)
-				useful := r.handleSched(sched)
-				if useful {
-					numSchedReplies += 1
-				}
+				r.handleSched(sched)
 			}
 
+			// Reset the window
 			r.highestSchedId += 1
 			r.numReqs = 0
+			r.numSchedReplies = 1
 
 			// Now we've gotten request rates from everyone
 			// Time to calculate a schedule
 			probs := softmax(r.schedRates)
-			numSlotAllocs, totalSlots := calculateSlots(r.N*r.schedW, probs)
+			numSlotAllocs, totalSlots := calculateSlots(r.schedW, probs)
 			// Don't forget to add startIndex to everything
-			startIndex := (r.N * r.schedW) * r.highestSchedId
+			startIndex := r.schedW * r.highestSchedId
 			specificSlotAllocs := assignSlots(totalSlots, numSlotAllocs, startIndex)
 
 			r.schedSlots = specificSlotAllocs[r.Id]
+			dlog.Println("done with scheduling, given slots: ", r.schedSlots)
 		}
 
 		select {
@@ -292,6 +295,11 @@ func (r *Replica) run() {
 			//got a Propose from a client
 			dlog.Printf("Proposal with id %d\n", propose.CommandId)
 			r.handlePropose(propose)
+			break
+
+		case schedS := <-r.schedChan:
+			sched := schedS.(*laambsproto.Schedule)
+			r.handleSched(sched)
 			break
 
 		case skipS := <-r.skipChan:
@@ -360,7 +368,9 @@ func (r *Replica) handleSched(sched *laambsproto.Schedule) bool {
 	if int(sched.SchedId) < r.highestSchedId {
 		return false
 	}
-	r.schedRates[sched.Instance] = int(sched.NumRequests)
+	dlog.Printf("Received Schedule from replica %d, for sched round %d\n", sched.ReplicaId, sched.SchedId)
+	r.schedRates[sched.ReplicaId] = int(sched.NumRequests)
+	r.numSchedReplies++
 	return true
 }
 
