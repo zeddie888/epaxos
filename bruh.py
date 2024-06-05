@@ -87,9 +87,11 @@ def conduct_experiment(name, trials, params):
 
 # conduct_experiment("skewed_workload_paxos", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "", 100_000])
 # conduct_experiment("skewed_workload_mencius", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
+# conduct_experiment("skewed_workload_bugged_mencius", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
 # conduct_experiment("skewed_workload_epaxos", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
 
 # conduct_experiment("egal_workload_paxos", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "", 100_000])
 # conduct_experiment("egal_workload_mencius", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
-conduct_experiment("egal_workload_epaxos", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
+conduct_experiment("egal_workload_bugged_mencius", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
+# conduct_experiment("egal_workload_epaxos", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
     
