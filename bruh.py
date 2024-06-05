@@ -80,13 +80,6 @@ def conduct_experiment(name, trials, params):
 #################################
 
 
-# Note: must set up server first. Paxos EX:
-# go run src/master/master.go
-# go run src/server/server.go -port 7070 -exec -dreply
-# go run src/server/server.go -port 7071 -exec -dreply
-# go run src/server/server.go -port 7072 -exec -dreply
-
-
 # Evaluating effected of skewed client request vs egalitarian client requests
 # over various conflict & write rates [-1, 0, 50, 100] x [0, 50, 100]
 # at 100,000 requests
@@ -94,5 +87,9 @@ def conduct_experiment(name, trials, params):
 
 # conduct_experiment("skewed_workload_paxos", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "", 100_000])
 # conduct_experiment("skewed_workload_mencius", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
-conduct_experiment("skewed_workload_epaxos", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
+# conduct_experiment("skewed_workload_epaxos", 5, [True, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
+
+# conduct_experiment("egal_workload_paxos", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "", 100_000])
+# conduct_experiment("egal_workload_mencius", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-m", 100_000])
+conduct_experiment("egal_workload_epaxos", 5, [False, False, [-1, 0, 50, 100], [0, 50, 100], "-e", 100_000])
     

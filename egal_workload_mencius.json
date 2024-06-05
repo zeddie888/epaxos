@@ -1,0 +1,86 @@
+{
+    "-1,0": [
+        "Zipfian distribution:\nRound took 3.674034376s\nTest took 3.674087858s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.274923461s\nTest took 3.274990046s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.280856126s\nTest took 3.280923068s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.360709151s\nTest took 3.360778606s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.437856368s\nTest took 3.437927178s\nSuccessful: 100000\n"
+    ],
+    "-1,50": [
+        "Zipfian distribution:\nRound took 3.459018619s\nTest took 3.459070263s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.219200853s\nTest took 3.219247224s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.697946872s\nTest took 3.698019607s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.499833952s\nTest took 3.49990045s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.503259915s\nTest took 3.503322944s\nSuccessful: 100000\n"
+    ],
+    "-1,100": [
+        "Zipfian distribution:\nRound took 3.603814417s\nTest took 3.603879821s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.65789059s\nTest took 3.657966982s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.507637834s\nTest took 3.507672254s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.587631344s\nTest took 3.587694477s\nSuccessful: 100000\n",
+        "Zipfian distribution:\nRound took 3.422925201s\nTest took 3.422991398s\nSuccessful: 100000\n"
+    ],
+    "0,0": [
+        "Uniform distribution\nRound took 3.224355006s\nTest took 3.224427115s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.273233134s\nTest took 3.273303609s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.409755361s\nTest took 3.409803973s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.416296684s\nTest took 3.416370034s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.39019821s\nTest took 3.390265135s\nSuccessful: 100000\n"
+    ],
+    "0,50": [
+        "Uniform distribution\nRound took 3.146473213s\nTest took 3.146556077s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.109282558s\nTest took 3.109351492s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.182232791s\nTest took 3.18230759s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.402601093s\nTest took 3.402681593s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.247290653s\nTest took 3.247352327s\nSuccessful: 100000\n"
+    ],
+    "0,100": [
+        "Uniform distribution\nRound took 3.410984647s\nTest took 3.411048056s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.377578191s\nTest took 3.377659879s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.158015482s\nTest took 3.158088003s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.445235777s\nTest took 3.44530641s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.711374317s\nTest took 3.711445985s\nSuccessful: 100000\n"
+    ],
+    "50,0": [
+        "Uniform distribution\nRound took 3.33267452s\nTest took 3.332748947s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.102288204s\nTest took 3.102364328s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.314305033s\nTest took 3.314373152s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.219059429s\nTest took 3.21911782s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.380133553s\nTest took 3.380206807s\nSuccessful: 100000\n"
+    ],
+    "50,50": [
+        "Uniform distribution\nRound took 3.395727897s\nTest took 3.395814005s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.585055597s\nTest took 3.585132561s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.595536186s\nTest took 3.595610178s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.199106576s\nTest took 3.199185951s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.548680682s\nTest took 3.548753322s\nSuccessful: 100000\n"
+    ],
+    "50,100": [
+        "Uniform distribution\nRound took 3.502832878s\nTest took 3.502889293s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.269211468s\nTest took 3.269286224s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.530227875s\nTest took 3.530323526s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.403203749s\nTest took 3.403272139s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.527455601s\nTest took 3.527516611s\nSuccessful: 100000\n"
+    ],
+    "100,0": [
+        "Uniform distribution\nRound took 3.473788538s\nTest took 3.473854137s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.590984588s\nTest took 3.591036585s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.104364795s\nTest took 3.104420656s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.287114639s\nTest took 3.287174847s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.419508146s\nTest took 3.41956423s\nSuccessful: 100000\n"
+    ],
+    "100,50": [
+        "Uniform distribution\nRound took 3.575863127s\nTest took 3.575950521s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.148418017s\nTest took 3.148470772s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.420933884s\nTest took 3.421015677s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.507099706s\nTest took 3.507173793s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.476668994s\nTest took 3.476743818s\nSuccessful: 100000\n"
+    ],
+    "100,100": [
+        "Uniform distribution\nRound took 3.500681103s\nTest took 3.500746022s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.378604069s\nTest took 3.378669783s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.552695648s\nTest took 3.552771097s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.799223529s\nTest took 3.799302767s\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.238845531s\nTest took 3.238925475s\nSuccessful: 100000\n"
+    ]
+}
