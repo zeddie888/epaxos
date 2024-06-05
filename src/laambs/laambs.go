@@ -264,7 +264,8 @@ func (r *Replica) run() {
 			// Block until we receive replies from all other replicas
 			for numSchedReplies < r.N {
 				// If we receive outdated schedule, ignore it
-				sched := <-r.schedChan
+				schedS := <-r.schedChan
+				sched := schedS.(*laambsproto.Schedule)
 				useful := r.handleSched(sched)
 				if useful {
 					numSchedReplies += 1
@@ -356,10 +357,10 @@ func (r *Replica) run() {
 }
 
 func (r *Replica) handleSched(sched *laambsproto.Schedule) bool {
-	if sched.SchedId < r.highestSchedId {
+	if int(sched.SchedId) < r.highestSchedId {
 		return false
 	}
-	r.schedRates[sched.Instance] = sched.NumRequests
+	r.schedRates[sched.Instance] = int(sched.NumRequests)
 	return true
 }
 
@@ -415,7 +416,7 @@ func (r *Replica) bcastSched() {
 		}
 	}()
 
-	args := &laambsproto.Schedule{r.numReqs, r.highestSchedId}
+	args := &laambsproto.Schedule{int32(r.numReqs), r.Id, int32(r.highestSchedId)}
 	q := r.Id
 	for sent := 0; sent < r.N; {
 		q = (q + 1) % int32(r.N)
