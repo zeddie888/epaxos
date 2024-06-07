@@ -23,26 +23,27 @@ const TRUE = uint8(1)
 const FALSE = uint8(0)
 
 type Replica struct {
-	*genericsmr.Replica      // extends a generic Paxos replica
-	skipChan                 chan fastrpc.Serializable
-	prepareChan              chan fastrpc.Serializable
-	acceptChan               chan fastrpc.Serializable
-	commitChan               chan fastrpc.Serializable
-	prepareReplyChan         chan fastrpc.Serializable
-	acceptReplyChan          chan fastrpc.Serializable
-	delayedSkipChan          chan *DelayedSkip
-	skipRPC                  uint8
-	prepareRPC               uint8
-	acceptRPC                uint8
-	commitRPC                uint8
-	prepareReplyRPC          uint8
-	acceptReplyRPC           uint8
-	clockChan                chan bool   // clock
-	instanceSpace            []*Instance // the space of all instances (used and not yet used)
-	crtInstance              int32       // highest active instance number that this replica knows about
-	latestInstReady          int32       // highest instance number that is in the READY state (ready to commit)
-	latestInstCommitted      int32       // highest instance number (owned by the current replica) that was committed
-	blockingInstance         int32       // the lowest instance that could block commits
+	*genericsmr.Replica // extends a generic Paxos replica
+	skipChan            chan fastrpc.Serializable
+	prepareChan         chan fastrpc.Serializable
+	acceptChan          chan fastrpc.Serializable
+	commitChan          chan fastrpc.Serializable
+	prepareReplyChan    chan fastrpc.Serializable
+	acceptReplyChan     chan fastrpc.Serializable
+	delayedSkipChan     chan *DelayedSkip
+	skipRPC             uint8
+	prepareRPC          uint8
+	acceptRPC           uint8
+	commitRPC           uint8
+	prepareReplyRPC     uint8
+	acceptReplyRPC      uint8
+	clockChan           chan bool   // clock
+	instanceSpace       []*Instance // the space of all instances (used and not yet used)
+	// TODO: imo, a better description of crtInstance is "the next slot this replica is going to coordinate"
+	crtInstance              int32 // highest active instance number that this replica knows about
+	latestInstReady          int32 // highest instance number that is in the READY state (ready to commit)
+	latestInstCommitted      int32 // highest instance number (owned by the current replica) that was committed
+	blockingInstance         int32 // the lowest instance that could block commits
 	noCommitFor              int
 	waitingToCommitSomething bool
 	Shutdown                 bool
@@ -191,6 +192,10 @@ func NewReplica(id int, peerAddrList []string, thrifty bool, exec bool, dreply b
 	go r.run()
 
 	return r
+}
+
+func (r *Replica) isLeader() bool {
+	return r.Id == 0
 }
 
 // append a log entry to stable storage
@@ -569,8 +574,13 @@ func (r *Replica) bcastCommit(instance int32, skip uint8, nbInstToSkip int32, co
 
 func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 
+	if !r.isLeader() {
+		dlog.Println("FATAL ERROR: non-leader received proposal")
+		return
+	}
+
 	instNo := r.crtInstance
-	r.crtInstance += int32(r.N)
+	r.crtInstance++
 
 	r.instanceSpace[instNo] = &Instance{false,
 		0,
@@ -598,6 +608,8 @@ func (r *Replica) handleSkip(skip *laambsproto.Skip) {
 }
 
 func (r *Replica) handlePrepare(prepare *laambsproto.Prepare) {
+	// This should never occur
+	dlog.Println("ERROR: handlePrepare should never occur")
 	inst := r.instanceSpace[prepare.Instance]
 
 	if inst == nil {
@@ -642,6 +654,7 @@ func (r *Replica) timerHelper(ds *DelayedSkip) {
 }
 
 func (r *Replica) handleAccept(accept *laambsproto.Accept) {
+	// This is the "suggest"
 	flush := true
 	inst := r.instanceSpace[accept.Instance]
 
@@ -653,11 +666,14 @@ func (r *Replica) handleAccept(accept *laambsproto.Accept) {
 	skipStart := int32(-1)
 	skipEnd := int32(-1)
 	if accept.Skip == FALSE && r.crtInstance < accept.Instance {
+		// If accept slot is higher than crtInstance, we need to skip some slots
 		skipStart = r.crtInstance
 		skipEnd = accept.Instance/int32(r.N)*int32(r.N) + r.Id
 		if skipEnd > accept.Instance {
 			skipEnd -= int32(r.N)
 		}
+
+		// Set skipEnd = last instance we need to skip
 		if r.skipsWaiting < MAX_SKIPS_WAITING {
 			//start a timer, waiting for a propose to arrive and fill this hole
 			go r.timerHelper(&DelayedSkip{skipEnd})
@@ -675,6 +691,7 @@ func (r *Replica) handleAccept(accept *laambsproto.Accept) {
 		r.recordInstanceMetadata(r.instanceSpace[r.crtInstance])
 		r.sync()
 
+		// Update crtInstance to first non-skipped instance we coordinate
 		r.crtInstance = skipEnd + int32(r.N)
 	}
 	if inst == nil {
@@ -692,6 +709,7 @@ func (r *Replica) handleAccept(accept *laambsproto.Accept) {
 		r.recordCommand(&accept.Command)
 		r.sync()
 
+		// Piggyback the slots we skipped onto the accept
 		r.replyAccept(accept.LeaderId, &laambsproto.AcceptReply{accept.Instance, TRUE, -1, skipStart, skipEnd})
 	} else {
 		if inst.status == COMMITTED || inst.status == EXECUTED {
@@ -882,6 +900,7 @@ func (r *Replica) handleAcceptReply(areply *laambsproto.AcceptReply) {
 	}
 }
 
+// TODO: only place that uses the nbInstanceSkipped
 func (r *Replica) updateBlocking(instance int32) {
 	if instance != r.blockingInstance {
 		return
@@ -1021,6 +1040,7 @@ func (r *Replica) forceCommit() {
 	problemInstance := r.blockingInstance
 
 	//try to take over the problem instance
+	// Note: this implementation only allows a certain replica to take over the problem instance
 	if int(problemInstance)%r.N == int(r.Id+1)%r.N {
 		log.Println("Replica", r.Id, "Trying to take over instance", problemInstance)
 		if r.instanceSpace[problemInstance] == nil {
