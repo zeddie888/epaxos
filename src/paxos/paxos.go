@@ -378,7 +378,7 @@ func (r *Replica) bcastCommit(instance int32, ballot int32, command []state.Comm
 
 func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 	if !r.IsLeader {
-		preply := &genericsmrproto.ProposeReplyTS{FALSE, -1, state.NIL, 0}
+		preply := &genericsmrproto.ProposeReplyTS{FALSE, propose.CommandId, state.NIL, 0}
 		r.ReplyProposeTS(preply, propose.Reply)
 		return
 	}

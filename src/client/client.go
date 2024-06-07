@@ -14,7 +14,10 @@ import (
 	"net/rpc"
 	"runtime"
 	"time"
+	"sort"
 )
+
+const TRUE = uint8(1)
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
@@ -24,6 +27,10 @@ var noLeader *bool = flag.Bool("e", false, "Egalitarian (no leader). Defaults to
 var fast *bool = flag.Bool("f", false, "Fast Paxos: send message directly to all replicas. Defaults to false.")
 var rounds *int = flag.Int("r", 1, "Split the total number of requests into this many rounds, and do rounds sequentially. Defaults to 1.")
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
+var lat = flag.Bool("lat", false, "Determine if we want to compute latency per message.")
+var through = flag.Bool("through", false, "Determine if we want to compute throughput of experiment.")
+var batch = flag.Bool("batch", false, "Batch client requests.")
+var unif = flag.Bool("unif", false, "Determine if client request is uniform or bursty. Defaults to bursty")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
 var conflicts *int = flag.Int("c", -1, "Percentage of conflicts. Defaults to 0%")
@@ -36,6 +43,8 @@ var successful []int
 
 var rarray []int
 var rsp []bool
+var rsp_time []int64
+var total_resp int64
 
 func main() {
 	flag.Parse()
@@ -102,6 +111,17 @@ func main() {
 		//fmt.Println(test[0:100])
 	}
 
+	// request pattern idea: directly mast karray to space out requests to prevent burstiness.
+	if *unif {
+		mask(karray, 100, 1)
+		// cut expected replica request count depending on skipped message
+		for i := 0; i < len(rarray); i++ {
+			if karray[i] == -1 {
+				perReplicaCount[rarray[i]]--
+			}
+		}
+	}
+
 	for i := 0; i < N; i++ {
 		var err error
 		servers[i], err = net.Dial("tcp", rlReply.ReplicaList[i])
@@ -128,6 +148,9 @@ func main() {
 	done := make(chan bool, N)
 	args := genericsmrproto.Propose{id, state.Command{state.PUT, 0, 0}, 0}
 
+	rsp_time = make([]int64, *reqsNb)
+	total_resp = 0
+
 	before_total := time.Now()
 
 	for j := 0; j < *rounds; j++ {
@@ -146,12 +169,22 @@ func main() {
 				go waitReplies(readers, i, perReplicaCount[i], done)
 			}
 		} else {
-			go waitReplies(readers, leader, n, done)
+			// expected message should be sum of all replica counts
+			count := 0
+			for i := 0; i < N; i++ {
+				count += perReplicaCount[i]
+			}
+			go waitReplies(readers, leader, count, done)
 		}
 
 		before := time.Now()
 
 		for i := 0; i < n+*eps; i++ {
+			// ignore masked messages
+			if karray[i] == -1 {
+				fmt.Printf("Not sending message: %v\n", i)
+				continue
+			}
 			dlog.Printf("Sending proposal %d\n", id)
 			args.CommandId = id
 			if put[i] {
@@ -161,13 +194,16 @@ func main() {
 			}
 			args.Command.K = state.Key(karray[i])
 			args.Command.V = state.Value(i)
-			//args.Timestamp = time.Now().UnixNano()
+			args.Timestamp = time.Now().UnixNano()
 			if !*fast {
 				if *noLeader {
 					leader = rarray[i]
 				}
 				writers[leader].WriteByte(genericsmrproto.PROPOSE)
 				args.Marshal(writers[leader])
+				if !*batch {
+					writers[leader].Flush()
+				}
 			} else {
 				//send to everyone
 				for rep := 0; rep < N; rep++ {
@@ -178,7 +214,7 @@ func main() {
 			}
 			//fmt.Println("Sent", id)
 			id++
-			if i%100 == 0 {
+			if *batch && i%100 == 0 {
 				for i := 0; i < N; i++ {
 					writers[i].Flush()
 				}
@@ -223,11 +259,32 @@ func main() {
 	}
 
 	after_total := time.Now()
-	fmt.Printf("Test took %v\n", after_total.Sub(before_total))
+	total_time := after_total.Sub(before_total)
+	fmt.Printf("Test took %v\n", total_time)
+
+	if *lat {
+		sort.Slice(rsp_time, func(i int, j int) bool {
+			return rsp_time[i] < rsp_time[j]
+		})
+		// find p99
+		p99_ind := int32(0.99 * float64(*reqsNb))
+		fmt.Printf("P99 RTT Latency: %vms\n", float64(rsp_time[p99_ind]) / 1e6)
+		// copmute avg reply time
+		sum := 0.0
+		for i := 0; i < *reqsNb; i++ {
+			sum += float64(rsp_time[i]) / 1e6
+		}
+
+		fmt.Printf("Avg rtt latency: %vms\n", sum/float64(total_resp))
+	}
 
 	s := 0
 	for _, succ := range successful {
 		s += succ
+	}
+
+	if *through {
+		fmt.Printf("Avg throughput: %vrequest/ms\n", float64(s) / float64(total_time.Milliseconds()))
 	}
 
 	fmt.Printf("Successful: %d\n", s)
@@ -243,6 +300,8 @@ func main() {
 func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 	e := false
 
+	// fmt.Printf("wait replies called on leader: %v, with per replica count: %v\n", leader, n)
+
 	reply := new(genericsmrproto.ProposeReplyTS)
 	for i := 0; i < n; i++ {
 		if err := reply.Unmarshal(readers[leader]); err != nil {
@@ -251,15 +310,40 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 			continue
 		}
 		//fmt.Println(reply.Value)
-		if *check {
-			if rsp[reply.CommandId] {
-				fmt.Println("Duplicate reply", reply.CommandId)
+		if *lat {
+			if reply.OK == TRUE {
+				rsp_time[reply.CommandId] = time.Now().UnixNano() - reply.Timestamp
+				total_resp++
+				// fmt.Printf("Reply rtt: %vns\n", rsp_time[reply.CommandId])
 			}
-			rsp[reply.CommandId] = true
+		}
+		if *check {
+			if reply.OK == TRUE {
+				if rsp[reply.CommandId] {
+					dlog.Println("Duplicate reply", reply.CommandId)
+				}
+				rsp[reply.CommandId] = true
+			} else {
+				dlog.Printf("Message: %v ignored due to reply not ok\n", reply.CommandId)
+			}
 		}
 		if reply.OK != 0 {
 			successful[leader]++
 		}
 	}
 	done <- e
+}
+
+// Given a key array, continuously mask_size portion of key by -1.
+// Each mask is spaced mask_step number of slots away from each other.
+func mask(key_arr []int64, mask_size int, mask_step int) {
+	len := *reqsNb / *rounds + *eps
+	for i := 0; i < len; i += mask_step {
+		// mask elements accordingly
+		j := 0
+		for ; i + j < len && j < mask_size; j++ {
+			key_arr[i + j] = -1
+		}
+		i += j // advance to end of mask
+	}
 }
