@@ -1,0 +1,16 @@
+{
+    "100": [
+        "Uniform distribution\nRound took 5.366729ms\nTest took 5.394631ms\nP99 RTT Latency: 4.62467ms\nAvg rtt latency: 3.95516323ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 3.170156ms\nTest took 3.204144ms\nP99 RTT Latency: 2.343731ms\nAvg rtt latency: 2.1381745499999996ms\nAvg throughput: 33.333333333333336request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 5.675637ms\nTest took 5.703503ms\nP99 RTT Latency: 4.871822ms\nAvg rtt latency: 4.02925007ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 3.321857ms\nTest took 3.3549ms\nP99 RTT Latency: 2.587857ms\nAvg rtt latency: 2.31974673ms\nAvg throughput: 33.333333333333336request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 4.476984ms\nTest took 4.504874ms\nP99 RTT Latency: 3.841981ms\nAvg rtt latency: 2.5752382999999996ms\nAvg throughput: 25.0request/ms\nSuccessful: 100\n"
+    ],
+    "500": [
+        "Uniform distribution\nRound took 21.173847ms\nTest took 21.198188ms\nP99 RTT Latency: 18.440666ms\nAvg rtt latency: 13.864675414000008ms\nAvg throughput: 23.80952380952381request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 16.136583ms\nTest took 16.163606ms\nP99 RTT Latency: 12.383864ms\nAvg rtt latency: 8.843718522000005ms\nAvg throughput: 31.25request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 28.009129ms\nTest took 28.044484ms\nP99 RTT Latency: 24.864321ms\nAvg rtt latency: 18.534003046ms\nAvg throughput: 17.857142857142858request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 36.47275ms\nTest took 36.508814ms\nP99 RTT Latency: 33.682373ms\nAvg rtt latency: 24.161063156000004ms\nAvg throughput: 13.88888888888889request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 14.174289ms\nTest took 14.197212ms\nP99 RTT Latency: 11.801317ms\nAvg rtt latency: 8.769531100000009ms\nAvg throughput: 35.714285714285715request/ms\nSuccessful: 500\n"
+    ]
+}

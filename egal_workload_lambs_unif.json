@@ -1,0 +1,9 @@
+{
+    "50,50": [
+        "Uniform distribution\nRound took 543.638902ms\nTest took 543.853639ms\nP99 RTT Latency: 436.387645ms\nAvg rtt latency: 297.45825691938546ms\nAvg throughput: 36.83241252302026request/ms\nSuccessful: 20000\n",
+        "Uniform distribution\nRound took 530.177115ms\nTest took 530.440471ms\nP99 RTT Latency: 416.98541ms\nAvg rtt latency: 287.2788948453916ms\nAvg throughput: 37.735849056603776request/ms\nSuccessful: 20000\n",
+        "Uniform distribution\nRound took 440.65517ms\nTest took 440.842904ms\nP99 RTT Latency: 330.905934ms\nAvg rtt latency: 228.18750596359953ms\nAvg throughput: 45.45454545454545request/ms\nSuccessful: 20000\n",
+        "Uniform distribution\nRound took 445.33616ms\nTest took 445.648763ms\nP99 RTT Latency: 321.525177ms\nAvg rtt latency: 218.03512505201738ms\nAvg throughput: 44.943820224719104request/ms\nSuccessful: 20000\n",
+        "Uniform distribution\nRound took 513.266988ms\nTest took 513.509449ms\nP99 RTT Latency: 399.479313ms\nAvg rtt latency: 247.75457627727067ms\nAvg throughput: 38.98635477582846request/ms\nSuccessful: 20000\n"
+    ]
+}

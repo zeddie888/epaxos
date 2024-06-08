@@ -112,8 +112,9 @@ func main() {
 	}
 
 	// request pattern idea: directly mast karray to space out requests to prevent burstiness.
+	removed := 0
 	if *unif {
-		mask(karray, 100, 1)
+		removed = mask(karray, 4, 1)
 		// cut expected replica request count depending on skipped message
 		for i := 0; i < len(rarray); i++ {
 			if karray[i] == -1 {
@@ -170,10 +171,10 @@ func main() {
 			}
 		} else {
 			// expected message should be sum of all replica counts
-			count := 0
-			for i := 0; i < N; i++ {
-				count += perReplicaCount[i]
-			}
+			count := n - removed
+			// for i := 0; i < N; i++ {
+			// 	count += perReplicaCount[i]
+			// }
 			go waitReplies(readers, leader, count, done)
 		}
 
@@ -182,7 +183,7 @@ func main() {
 		for i := 0; i < n+*eps; i++ {
 			// ignore masked messages
 			if karray[i] == -1 {
-				fmt.Printf("Not sending message: %v\n", i)
+				dlog.Printf("Not sending message: %v\n", i)
 				continue
 			}
 			dlog.Printf("Sending proposal %d\n", id)
@@ -267,7 +268,9 @@ func main() {
 			return rsp_time[i] < rsp_time[j]
 		})
 		// find p99
-		p99_ind := int32(0.99 * float64(*reqsNb))
+		// compute actual number of procssed reqs
+		processed := *reqsNb - removed
+		p99_ind := int32(removed) + int32(0.99 * float64(processed))
 		fmt.Printf("P99 RTT Latency: %vms\n", float64(rsp_time[p99_ind]) / 1e6)
 		// copmute avg reply time
 		sum := 0.0
@@ -314,7 +317,7 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 			if reply.OK == TRUE {
 				rsp_time[reply.CommandId] = time.Now().UnixNano() - reply.Timestamp
 				total_resp++
-				// fmt.Printf("Reply rtt: %vns\n", rsp_time[reply.CommandId])
+				// fmt.Printf("Reply rtt: %vms\n", float64(rsp_time[reply.CommandId]) / 1e6)
 			}
 		}
 		if *check {
@@ -336,14 +339,17 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 
 // Given a key array, continuously mask_size portion of key by -1.
 // Each mask is spaced mask_step number of slots away from each other.
-func mask(key_arr []int64, mask_size int, mask_step int) {
-	len := *reqsNb / *rounds + *eps
+func mask(key_arr []int64, mask_size int, mask_step int) int{
+	removed := 0
+	len := len(key_arr)
 	for i := 0; i < len; i += mask_step {
 		// mask elements accordingly
 		j := 0
 		for ; i + j < len && j < mask_size; j++ {
 			key_arr[i + j] = -1
+			removed++
 		}
 		i += j // advance to end of mask
 	}
+	return removed
 }

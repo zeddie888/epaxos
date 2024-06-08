@@ -1,0 +1,58 @@
+{
+    "100": [
+        "Uniform distribution\nRound took 5.366729ms\nTest took 5.394631ms\nP99 RTT Latency: 4.62467ms\nAvg rtt latency: 3.95516323ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 3.170156ms\nTest took 3.204144ms\nP99 RTT Latency: 2.343731ms\nAvg rtt latency: 2.1381745499999996ms\nAvg throughput: 33.333333333333336request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 5.675637ms\nTest took 5.703503ms\nP99 RTT Latency: 4.871822ms\nAvg rtt latency: 4.02925007ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 3.321857ms\nTest took 3.3549ms\nP99 RTT Latency: 2.587857ms\nAvg rtt latency: 2.31974673ms\nAvg throughput: 33.333333333333336request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 4.476984ms\nTest took 4.504874ms\nP99 RTT Latency: 3.841981ms\nAvg rtt latency: 2.5752382999999996ms\nAvg throughput: 25.0request/ms\nSuccessful: 100\n"
+    ],
+    "500": [
+        "Uniform distribution\nRound took 21.173847ms\nTest took 21.198188ms\nP99 RTT Latency: 18.440666ms\nAvg rtt latency: 13.864675414000008ms\nAvg throughput: 23.80952380952381request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 16.136583ms\nTest took 16.163606ms\nP99 RTT Latency: 12.383864ms\nAvg rtt latency: 8.843718522000005ms\nAvg throughput: 31.25request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 28.009129ms\nTest took 28.044484ms\nP99 RTT Latency: 24.864321ms\nAvg rtt latency: 18.534003046ms\nAvg throughput: 17.857142857142858request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 36.47275ms\nTest took 36.508814ms\nP99 RTT Latency: 33.682373ms\nAvg rtt latency: 24.161063156000004ms\nAvg throughput: 13.88888888888889request/ms\nSuccessful: 500\n",
+        "Uniform distribution\nRound took 14.174289ms\nTest took 14.197212ms\nP99 RTT Latency: 11.801317ms\nAvg rtt latency: 8.769531100000009ms\nAvg throughput: 35.714285714285715request/ms\nSuccessful: 500\n"
+    ],
+    "1000": [
+        "Uniform distribution\nRound took 48.313113ms\nTest took 48.354261ms\nP99 RTT Latency: 42.38425ms\nAvg rtt latency: 29.218314601999985ms\nAvg throughput: 20.833333333333332request/ms\nSuccessful: 1000\n",
+        "Uniform distribution\nRound took 50.915582ms\nTest took 50.941546ms\nP99 RTT Latency: 43.007391ms\nAvg rtt latency: 31.86016194699998ms\nAvg throughput: 20.0request/ms\nSuccessful: 1000\n",
+        "Uniform distribution\nRound took 51.035943ms\nTest took 51.072651ms\nP99 RTT Latency: 45.097349ms\nAvg rtt latency: 29.473914901000054ms\nAvg throughput: 19.607843137254903request/ms\nSuccessful: 1000\n",
+        "Uniform distribution\nRound took 40.067203ms\nTest took 40.094465ms\nP99 RTT Latency: 32.579705ms\nAvg rtt latency: 20.669710841000015ms\nAvg throughput: 25.0request/ms\nSuccessful: 1000\n",
+        "Uniform distribution\nRound took 41.514904ms\nTest took 41.543607ms\nP99 RTT Latency: 34.930696ms\nAvg rtt latency: 25.622262211000006ms\nAvg throughput: 24.390243902439025request/ms\nSuccessful: 1000\n"
+    ],
+    "2500": [
+        "Uniform distribution\nRound took 111.685631ms\nTest took 111.735486ms\nP99 RTT Latency: 96.324335ms\nAvg rtt latency: 67.32094794680008ms\nAvg throughput: 22.52252252252252request/ms\nSuccessful: 2500\n",
+        "Uniform distribution\nRound took 111.253478ms\nTest took 111.288154ms\nP99 RTT Latency: 97.325967ms\nAvg rtt latency: 64.8691415640001ms\nAvg throughput: 22.52252252252252request/ms\nSuccessful: 2500\n",
+        "Uniform distribution\nRound took 107.24101ms\nTest took 107.272936ms\nP99 RTT Latency: 93.586932ms\nAvg rtt latency: 65.22690873839993ms\nAvg throughput: 23.364485981308412request/ms\nSuccessful: 2500\n",
+        "Uniform distribution\nRound took 109.224031ms\nTest took 109.262069ms\nP99 RTT Latency: 94.256892ms\nAvg rtt latency: 72.86547961679995ms\nAvg throughput: 22.93577981651376request/ms\nSuccessful: 2500\n",
+        "Uniform distribution\nRound took 116.508722ms\nTest took 116.546148ms\nP99 RTT Latency: 102.185186ms\nAvg rtt latency: 66.42368063319998ms\nAvg throughput: 21.551724137931036request/ms\nSuccessful: 2500\n"
+    ],
+    "5000": [
+        "Uniform distribution\nRound took 207.916438ms\nTest took 207.953328ms\nP99 RTT Latency: 170.954342ms\nAvg rtt latency: 117.67460323219996ms\nAvg throughput: 24.154589371980677request/ms\nSuccessful: 5000\n",
+        "Uniform distribution\nRound took 209.399432ms\nTest took 209.439827ms\nP99 RTT Latency: 163.282661ms\nAvg rtt latency: 120.2966276306001ms\nAvg throughput: 23.923444976076556request/ms\nSuccessful: 5000\n",
+        "Uniform distribution\nRound took 186.068691ms\nTest took 186.114926ms\nP99 RTT Latency: 159.908159ms\nAvg rtt latency: 113.10854841380008ms\nAvg throughput: 26.881720430107528request/ms\nSuccessful: 5000\n",
+        "Uniform distribution\nRound took 221.421483ms\nTest took 221.449538ms\nP99 RTT Latency: 193.278628ms\nAvg rtt latency: 133.49693073559956ms\nAvg throughput: 22.624434389140273request/ms\nSuccessful: 5000\n",
+        "Uniform distribution\nRound took 203.413583ms\nTest took 203.451806ms\nP99 RTT Latency: 166.972632ms\nAvg rtt latency: 110.73562749879996ms\nAvg throughput: 24.63054187192118request/ms\nSuccessful: 5000\n"
+    ],
+    "10000": [
+        "Uniform distribution\nRound took 453.72972ms\nTest took 453.774931ms\nP99 RTT Latency: 395.826668ms\nAvg rtt latency: 273.1542690044993ms\nAvg throughput: 22.075055187637968request/ms\nSuccessful: 10000\n",
+        "Uniform distribution\nRound took 426.101175ms\nTest took 426.138275ms\nP99 RTT Latency: 361.45084ms\nAvg rtt latency: 253.84038260520086ms\nAvg throughput: 23.474178403755868request/ms\nSuccessful: 10000\n",
+        "Uniform distribution\nRound took 303.749872ms\nTest took 303.791382ms\nP99 RTT Latency: 212.187825ms\nAvg rtt latency: 149.31797313459975ms\nAvg throughput: 33.00330033003301request/ms\nSuccessful: 10000\n",
+        "Uniform distribution\nRound took 466.97112ms\nTest took 467.01336ms\nP99 RTT Latency: 404.106571ms\nAvg rtt latency: 282.7833978031008ms\nAvg throughput: 21.41327623126338request/ms\nSuccessful: 10000\n",
+        "Uniform distribution\nRound took 368.081845ms\nTest took 368.107712ms\nP99 RTT Latency: 318.323143ms\nAvg rtt latency: 217.38763530499958ms\nAvg throughput: 27.17391304347826request/ms\nSuccessful: 10000\n"
+    ],
+    "50000": [
+        "Uniform distribution\nRound took 1.97572143s\nTest took 1.975772213s\nP99 RTT Latency: 1557.196447ms\nAvg rtt latency: 1075.2148881520557ms\nAvg throughput: 25.31645569620253request/ms\nSuccessful: 50000\n",
+        "Uniform distribution\nRound took 2.037889324s\nTest took 2.037944355s\nP99 RTT Latency: 1797.432051ms\nAvg rtt latency: 1168.3665797073118ms\nAvg throughput: 24.54590083456063request/ms\nSuccessful: 50000\n",
+        "Uniform distribution\nRound took 1.913872555s\nTest took 1.913927535s\nP99 RTT Latency: 1395.066757ms\nAvg rtt latency: 955.5100130906139ms\nAvg throughput: 26.136957658128594request/ms\nSuccessful: 50000\n",
+        "Uniform distribution\nRound took 2.17006204s\nTest took 2.170100823s\nP99 RTT Latency: 1785.184691ms\nAvg rtt latency: 1226.6691017726582ms\nAvg throughput: 23.04147465437788request/ms\nSuccessful: 50000\n",
+        "Uniform distribution\nRound took 1.930343563s\nTest took 1.93039072s\nP99 RTT Latency: 1584.471825ms\nAvg rtt latency: 1067.0305286553473ms\nAvg throughput: 25.906735751295336request/ms\nSuccessful: 50000\n"
+    ],
+    "100000": [
+        "Uniform distribution\nRound took 3.791612866s\nTest took 3.791846881s\nP99 RTT Latency: 3008.402253ms\nAvg rtt latency: 2019.011352436566ms\nAvg throughput: 26.378264310208387request/ms\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.200646453s\nTest took 3.200869393s\nP99 RTT Latency: 2278.783665ms\nAvg rtt latency: 1609.7027114120433ms\nAvg throughput: 31.25request/ms\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 4.022220064s\nTest took 4.022446642s\nP99 RTT Latency: 3348.648137ms\nAvg rtt latency: 2233.7989060537125ms\nAvg throughput: 24.86325211337643request/ms\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 4.319703061s\nTest took 4.319991147s\nP99 RTT Latency: 3414.294166ms\nAvg rtt latency: 2367.5673934047536ms\nAvg throughput: 23.1535077564251request/ms\nSuccessful: 100000\n",
+        "Uniform distribution\nRound took 3.6549122s\nTest took 3.655112333s\nP99 RTT Latency: 2898.873756ms\nAvg rtt latency: 2017.8974000314763ms\nAvg throughput: 27.359781121751027request/ms\nSuccessful: 100000\n"
+    ]
+}

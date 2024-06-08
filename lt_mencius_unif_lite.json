@@ -1,0 +1,16 @@
+{
+    "100": [
+        "Uniform distribution\nRound took 2.256945ms\nTest took 2.297398ms\nP99 RTT Latency: 2.039268ms\nAvg rtt latency: 1.00034555ms\nAvg throughput: 10request/ms\nSuccessful: 20\n",
+        "Uniform distribution\nRound took 2.271267ms\nTest took 2.293083ms\nP99 RTT Latency: 2.088337ms\nAvg rtt latency: 1.00586175ms\nAvg throughput: 10request/ms\nSuccessful: 20\n",
+        "Uniform distribution\nRound took 1.042214ms\nTest took 1.074552ms\nP99 RTT Latency: 1.02757ms\nAvg rtt latency: 0.9244484500000001ms\nAvg throughput: 20.0request/ms\nSuccessful: 20\n",
+        "Uniform distribution\nRound took 2.055115ms\nTest took 2.08687ms\nP99 RTT Latency: 1.887181ms\nAvg rtt latency: 1.6815217999999998ms\nAvg throughput: 10request/ms\nSuccessful: 20\n",
+        "Uniform distribution\nRound took 2.258603ms\nTest took 2.289386ms\nP99 RTT Latency: 2.03388ms\nAvg rtt latency: 1.6844694500000004ms\nAvg throughput: 10request/ms\nSuccessful: 20\n"
+    ],
+    "500": [
+        "Uniform distribution\nRound took 5.197478ms\nTest took 5.224974ms\nP99 RTT Latency: 4.545965ms\nAvg rtt latency: 3.555066599999998ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 4.273653ms\nTest took 4.30933ms\nP99 RTT Latency: 3.460606ms\nAvg rtt latency: 2.1784755300000005ms\nAvg throughput: 25.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 3.817302ms\nTest took 3.841296ms\nP99 RTT Latency: 3.149832ms\nAvg rtt latency: 2.09935712ms\nAvg throughput: 33.333333333333336request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 5.427433ms\nTest took 5.458285ms\nP99 RTT Latency: 4.710277ms\nAvg rtt latency: 3.894235450000002ms\nAvg throughput: 20.0request/ms\nSuccessful: 100\n",
+        "Uniform distribution\nRound took 6.677961ms\nTest took 6.709156ms\nP99 RTT Latency: 5.995236ms\nAvg rtt latency: 3.9027282499999982ms\nAvg throughput: 16.666666666666668request/ms\nSuccessful: 100\n"
+    ]
+}
